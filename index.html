@@ -3,57 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>IPD CRM - Hello</title>
+  <title>IPD CRM - Landing</title>
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; padding: 2rem; }
-    .hidden { display: none; }
-    .center { max-width: 600px; margin: 2rem auto; text-align: center; }
-    a.button { display:inline-block; padding:0.5rem 1rem; background:#0078D4; color:#fff; text-decoration:none; border-radius:4px; }
+    body { font-family: Arial, Helvetica, sans-serif; padding: 2rem; text-align:center; }
+    .button { display:inline-block; padding:0.5rem 1rem; background:#0078D4; color:#fff; text-decoration:none; border-radius:4px; }
   </style>
 </head>
 <body>
-  <div class="center">
-    <h1 id="headline">Hello — please sign in</h1>
-
-    <div id="signedOut">
-      <p>You must sign in with your Microsoft (Entra) account to view this page.</p>
-      <a id="signIn" class="button" href="/.auth/login/aad">Sign in with Microsoft</a>
-    </div>
-
-    <div id="signedIn" class="hidden">
-      <p id="greeting"></p>
-      <p><strong>User info JSON (debug):</strong></p>
-      <pre id="userjson" style="text-align:left; background:#f4f4f4; padding:1rem; border-radius:6px;"></pre>
-      <p><a id="signOut" class="button" href="/.auth/logout">Sign out</a></p>
-    </div>
-  </div>
+  <h1>IPD CRM</h1>
+  <p>This is the public landing page. You will be redirected after signing in.</p>
+  <p><a class="button" href="/.auth/login/aad">Sign in with Microsoft</a></p>
 
   <script>
-    async function checkAuth() {
+    // If already signed in, redirect to profile page.
+    (async function() {
       try {
-        const r = await fetch('/.auth/me', {cache: 'no-store'});
-        if (!r.ok) throw new Error('not ok');
-        const data = await r.json();
-        // Static Web Apps returns an array of provider objects when signed in
-        if (Array.isArray(data) && data.length > 0) {
-          const user = data[0];
-          document.getElementById('headline').textContent = 'Welcome to IPD CRM';
-          document.getElementById('greeting').textContent = `Hello, ${user.user_claims?.name || user.user_id || 'User'}!`;
-          document.getElementById('userjson').textContent = JSON.stringify(user, null, 2);
-          document.getElementById('signedOut').classList.add('hidden');
-          document.getElementById('signedIn').classList.remove('hidden');
-          return;
+        const r = await fetch('/.auth/me', { cache: 'no-store' });
+        if (!r.ok) return;
+        const arr = await r.json();
+        if (Array.isArray(arr) && arr.length > 0 && arr[0].user_claims) {
+          // Signed in — go to the protected profile page
+          window.location.href = '/profile.html';
         }
       } catch (e) {
-        // not signed in or error
+        // ignore and remain on landing
       }
-      // default: show signed out UI
-      document.getElementById('signedOut').classList.remove('hidden');
-      document.getElementById('signedIn').classList.add('hidden');
-      document.getElementById('headline').textContent = 'Hello — please sign in';
-    }
-
-    checkAuth();
+    })();
   </script>
 </body>
 </html>
