@@ -4,9 +4,12 @@
   },
   "routes": [
     {
-      "route": "/",
-      "rewrite": "/index.html",
+      "route": "/profile.html",
       "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/",
+      "rewrite": "/index.html"
     }
   ],
   "responseOverrides": {
